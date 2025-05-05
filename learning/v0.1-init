@@ -1,0 +1,101 @@
+# 🪜 First Step - TCP Banking Project in Rust
+
+## 🎯 Goal of the Commit
+
+Set up the basic structure of a TCP-based banking system in Rust that can:
+- Start either a **server** or a **client** based on CLI arguments.
+- Allow a client to send text-based commands to the server.
+- Let the server receive and print the commands (to be interpreted later).
+
+---
+
+## 📁 Project Structure (initial)
+```
+banking_project/
+├── Cargo.toml
+├── src/
+│   ├── main.rs              # Entry point, starts server or client based on args
+│   ├── lib.rs               # Optionally expose modules if you want reusability
+│
+│   ├── server.rs            # TCP server logic, handles client connections
+│   ├── client.rs            # TCP client logic, interacts with server
+│
+│   ├── bank.rs              # Central bank logic: account registry, transactions
+│   ├── account.rs           # Account struct and methods (deposit, withdraw, etc.)
+│   ├── commands.rs          # Command parser and dispatcher
+│   ├── utils.rs             # Shared utility functions (e.g. input handling)
+│
+│   └── net/
+│       ├── handler.rs       # Connection handler: parses TCP input & responds
+│       └── protocol.rs      # Defines the message format, parsing, validation
+│
+├── README.md
+└── tests/
+    ├── integration.rs       # Integration tests for client-server interactions
+```
+---
+
+## 🔧 `main.rs`
+
+**Functionality**:
+- Collects command-line arguments via `env::args()`.
+- Switches logic based on whether the user typed `"server"` or `"client"`.
+- Delegates control to `start_server()` or `start_client()` accordingly.
+
+**Struggle**:
+- Misused the argument index at first (`args[0]` is always the binary name).
+- Correct index for the first meaningful argument is `args[1]`.
+
+---
+
+## 🖥️ `server.rs`
+
+**Functionality**:
+- Binds a `TcpListener` to `127.0.0.1:7878`.
+- Waits in an infinite loop (`loop {}`) for client connections.
+- Wraps the `TcpStream` into a `BufReader`.
+- Reads client messages line by line using `.lines()`.
+
+**Struggles**:
+- Attempted to call `.accept()` on the `Result` instead of unwrapping it first.
+- Confused use of `stream.read(...)` and `BufReader` (mixed incompatible APIs).
+- Incorrectly wrote `stream.read(b"{}", f);` — wrong use of `read` and buffer.
+
+**Fix**:
+- Wrapped the stream using `BufReader::new(stream)`.
+- Iterated over `lines()` properly, using `match` to handle errors.
+
+---
+
+## 📲 `client.rs`
+
+**Functionality**:
+- Establishes a connection with the server at `127.0.0.1:7878`.
+- Sends a hardcoded command (e.g., `"BALANCE 123\n"`) using `write_all(...)`.
+
+**Struggles**:
+- Minor confusion around writing bytes vs strings.
+- Used raw bytes `b"..."` instead of converting a `String`.
+
+---
+
+## 🧠 Lessons Learned
+
+- TCP communication in Rust is **low-level** but clear with `std::net`.
+- `env::args()` returns all arguments including the binary path.
+- Always unwrap/bind Result types before calling methods on the inner value.
+- `BufReader` is ideal for handling line-based protocols.
+
+---
+
+## ✅ Next Steps
+
+- Add a `handler.rs` to parse and process commands like `BALANCE`, `DEPOSIT`, etc.
+- Implement actual account logic and shared state across clients.
+- Make server respond back to client using `write()`.
+
+---
+
+**Commit Title**: `first step`
+
+**Tagline**: Initialized TCP client/server logic and command routing based on args, with simple message sending and buffered reading.

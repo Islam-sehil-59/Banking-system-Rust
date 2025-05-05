@@ -1,0 +1,1 @@
+/* Account struct and methods (deposit, withdraw, etc.) */

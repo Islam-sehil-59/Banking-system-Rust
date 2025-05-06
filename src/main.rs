@@ -10,7 +10,7 @@ fn main(){
         println!("{}",error_dis);
     }
     if args.len() == 3 && args[1] == "client" && args[2] == "connect" {
-        client_connect();
+        let _ = client_connect();
     }
     match args[1].as_str() {
         "client" => {start_client();},

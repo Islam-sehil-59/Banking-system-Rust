@@ -1,27 +1,23 @@
-/* Entry point, starts server or client based on args */
 use std::env;
-mod client;
-use client::start_client;
-mod server;
-use server::start_server;
+use bank::client::start_client;
+use bank::server::start_server;
+use bank::net::auth::client_connect;
 
-
-fn main() {
-    let args: Vec<String>= env::args().collect();
-    // dbg!(&args);
-    // println!("{:?}", args);
-    match args[1].as_str(){
-        "server" => {
-            println!("starting server ...");
-            start_server();
-        },
-        "client" => {
-            println!("starting client ....");
-            start_client();
-        },
-        _ => {
-            println!("-- server\t\truns server ...\n-- client\t\truns client side ....");
-            dbg!(args);
+fn main(){
+    let args: Vec<String> = env::args().collect();
+    let error_dis: &str = "Error occured\n--help \t\tCkeck help and manuel";
+    if args.len() != 2 {
+        println!("{}",error_dis);
+    }
+    if args.len() == 3 && args[1] == "client" && args[2] == "connect" {
+        client_connect();
+    }
+    match args[1].as_str() {
+        "client" => {start_client();},
+        "server" => {start_server();},
+        "help"  => {
+            println!("Usage: cargo run -- client connect [ID]:[Pass]")
         }
+        _ => println!("{}",error_dis),
     }
 }

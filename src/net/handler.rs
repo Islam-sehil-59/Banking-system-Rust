@@ -1,1 +1,6 @@
-/* Connection handler: parses TCP input & responds */
+
+
+pub fn handler(){
+    println!("handler imported into server ...");
+    
+}
